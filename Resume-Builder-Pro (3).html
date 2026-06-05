@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder - Professional Resume Creator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .developer-credit {
+            font-size: 12px;
+            color: #999;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Template Selection */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .template-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: #f9f9f9;
+        }
+        
+        .template-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-6px);
+        }
+        
+        .template-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .template-card h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .template-card p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .template-preview {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #999;
+            height: 100px;
+            overflow: hidden;
+        }
+        
+        /* Form Styles */
+        .form-wrapper {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .form-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            padding: 11px 13px;
+            border: 1.5px solid #ddd;
+            border-radius: 7px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: #f9fbff;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 1.5px solid #ddd;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .btn-add {
+            background: #f0f0f0;
+            color: #667eea;
+            border: 1px solid #ddd;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        
+        .btn-add:hover {
+            background: #e8e8ff;
+            border-color: #667eea;
+        }
+        
+        .btn-remove {
+            background: #ffe0e0;
+            color: #d32f2f;
+            border: 1px solid #ffb3b3;
+            padding: 6px 10px;
+            font-size: 11px;
+            float: right;
+        }
+        
+        .btn-remove:hover {
+            background: #ffb3b3;
+        }
+        
+        /* Preview */
+        .preview-box {
+            border: 1.5px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            background: #f9f9f9;
+            max-height: 700px;
+            overflow-y: auto;
+        }
+        
+        #resume-preview {
+            background: white;
+            padding: 35px;
+            font-family: 'Calibri', 'Georgia', serif;
+            line-height: 1.5;
+            color: #2c2c2c;
+            border-radius: 8px;
+        }
+        
+        .resume-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+        
+        .resume-header h1 {
+            font-size: 26px;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .resume-header .contact-info {
+            font-size: 11px;
+            color: #555;
+            margin: 0;
+        }
+        
+        .resume-section {
+            margin-bottom: 18px;
+        }
+        
+        .resume-section h2 {
+            font-size: 13px;
+            font-weight: bold;
+            margin: 12px 0 8px 0;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .resume-item {
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+        
+        .resume-item-title {
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+        
+        .resume-item-subtitle {
+            color: #555;
+            font-size: 10px;
+            font-style: italic;
+            margin-bottom: 3px;
+        }
+        
+        .item-card {
+            border: 1px solid #e0e0e0;
+            background: #fafafa;
+            padding: 14px;
+            border-radius: 7px;
+            margin-bottom: 10px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .step {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #f0f0f0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .preview-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        @media (max-width: 1024px) {
+            .form-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .template-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📄 Resume Builder Pro</h1>
+        <p>Create Your Professional Resume in Minutes</p>
+        <div class="developer-credit">Developed by Raj | E-commerce Professional | Expert Resume Creator</div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <!-- Step 1: Template Selection -->
+            <div id="step-template" class="step-content">
+                <h2 style="margin-bottom: 25px; color: #333;">Choose Your Resume Template</h2>
+                <div class="template-grid">
+                    <div class="template-card" onclick="selectTemplate('modern')">
+                        <h3>Modern</h3>
+                        <p>Contemporary & Clean Design</p>
+                        <div class="template-preview">
+                            <strong>Modern Style</strong><br>
+                            Clean lines, professional colors, perfect for tech & corporate roles
+                        </div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('professional')">
+                        <h3>Professional</h3>
+                        <p>Classic Corporate Style</p>
+                        <div class="template-preview">
+                            <strong>Professional Style</strong><br>
+                            Traditional format, highly readable, ideal for all industries
+                        </div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('creative')">
+                        <h3>Creative</h3>
+                        <p>Bold & Distinctive Design</p>
+                        <div class="template-preview">
+                            <strong>Creative Style</strong><br>
+                            Unique layout, eye-catching, great for creative professionals
+                        </div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('yellow')">
+                        <h3 style="color:#e6b800;">⭐ Yellow Bright</h3>
+                        <p>Bold Yellow Header + Photo</p>
+                        <div class="template-preview" style="background:#fff9e6; border-color:#f0d000;">
+                            <div style="background:#f5c800; padding:6px; border-radius:4px; margin-bottom:6px;">
+                                <strong style="color:#000;">FULL NAME</strong><br>
+                                <span style="font-size:10px; color:#333;">Job Title</span>
+                            </div>
+                            <span style="background:#222; color:#fff; font-size:9px; padding:2px 5px; border-radius:2px;">DETAILS</span>
+                            <div style="font-size:9px; color:#555; margin-top:3px;">Contact • Skills • Experience</div>
+                        </div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('navy')">
+                        <h3 style="color:#1a2e4a;">🌊 Navy Executive</h3>
+                        <p>Dark Sidebar + Two Column</p>
+                        <div class="template-preview" style="display:flex; gap:4px; padding:8px; background:#f0f4f8; border-color:#1a2e4a;">
+                            <div style="background:#1a2e4a; width:38%; border-radius:3px; padding:5px;">
+                                <div style="background:#fff; width:20px; height:20px; border-radius:50%; margin:0 auto 4px;"></div>
+                                <div style="background:#ffffff44; height:3px; border-radius:2px; margin-bottom:3px;"></div>
+                                <div style="background:#ffffff33; height:3px; border-radius:2px;"></div>
+                            </div>
+                            <div style="flex:1; padding:3px;">
+                                <div style="background:#1a2e4a; height:3px; border-radius:2px; margin-bottom:3px;"></div>
+                                <div style="background:#ddd; height:2px; border-radius:2px; margin-bottom:2px;"></div>
+                                <div style="background:#ddd; height:2px; border-radius:2px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Form & Preview -->
+            <div id="step-form" class="step-content hidden">
+                <div class="step-indicator">
+                    <div class="step">Step 1: Choose Template</div>
+                    <div class="step active">Step 2: Fill Details</div>
+                    <div class="step">Step 3: Download</div>
+                </div>
+
+                <div class="form-wrapper">
+                    <!-- Left: Form -->
+                    <div>
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h2>👤 Personal Information</h2>
+                            <div class="form-group">
+                                <label>Profile Photo (Optional)</label>
+                                <input type="file" id="photoUpload" accept="image/*" onchange="handlePhotoUpload(this)" style="padding:6px; font-size:12px;">
+                                <div id="photoPreviewThumb" style="margin-top:6px; display:none;">
+                                    <img id="photoThumb" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid #667eea;" />
+                                    <button class="btn btn-remove" style="margin-left:8px; vertical-align:middle;" onclick="removePhoto()">Remove Photo</button>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Full Name</label>
+                                    <input type="text" id="fullName" value="RAJBAHADUR" onchange="updatePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Professional Title</label>
+                                    <input type="text" id="title" value="E-commerce Executive" onchange="updatePreview()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" id="email" value="Kumar.raj9435@gmail.com" onchange="updatePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone</label>
+                                    <input type="text" id="phone" value="+91-8826655562" onchange="updatePreview()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Location</label>
+                                    <input type="text" id="location" value="North East Delhi, Delhi-110094" onchange="updatePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label>LinkedIn Profile</label>
+                                    <input type="text" id="linkedin" value="" placeholder="linkedin.com/in/yourname" onchange="updatePreview()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Website / Portfolio</label>
+                                    <input type="text" id="website" value="" placeholder="yourwebsite.com" onchange="updatePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select id="gender" onchange="updatePreview()">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Summary -->
+                        <div class="form-section">
+                            <h2>📝 Professional Summary</h2>
+                            <textarea id="about" onchange="updatePreview()" placeholder="Brief overview of your professional background and key achievements...">E-commerce professional with 5+ years of proven expertise in product listing, catalog management, and marketplace operations. Skilled in managing multiple e-commerce platforms, inventory optimization, and data-driven decision making. Proficient in Excel automation, accounting software, and marketplace reconciliation.</textarea>
+                        </div>
+
+                        <!-- Experience -->
+                        <div class="form-section">
+                            <h2>💼 Experience</h2>
+                            <div id="experience-list"></div>
+                            <button class="btn btn-add" onclick="addExperience()">+ Add Experience</button>
+                        </div>
+
+                        <!-- Education -->
+                        <div class="form-section">
+                            <h2>🎓 Education</h2>
+                            <div id="education-list"></div>
+                            <button class="btn btn-add" onclick="addEducation()">+ Add Education</button>
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="form-section">
+                            <h2>🎯 Skills</h2>
+                            <textarea id="skills" onchange="updatePreview()" placeholder="Enter skills separated by commas...">E-commerce Operations, Amazon, Flipkart, Myntra, Nykaa, Meesho, Blinkit, Zepto, Product Listing, Catalog Management, Inventory Management, Marketplace Reconciliation, Advanced Excel, Unicommerce, Tally Prime, Busy Accounting, SEO Optimization, MIS Reporting</textarea>
+                        </div>
+
+                        <!-- Strengths -->
+                        <div class="form-section">
+                            <h2>💪 Strengths</h2>
+                            <textarea id="strengths" onchange="updatePreview()" placeholder="List your key strengths...">Energetic and able to work under pressure, Friendly and easy to work with, Optimistic attitude, Eager to learn new skills, Quickly adaptable, Strong analytical abilities, Detail-oriented, Self-motivated</textarea>
+                        </div>
+
+                        <!-- Languages -->
+                        <div class="form-section">
+                            <h2>🗣️ Languages</h2>
+                            <textarea id="languages" onchange="updatePreview()" placeholder="Languages you speak...">Hindi, English</textarea>
+                        </div>
+
+                        <!-- Personal Details -->
+                        <div class="form-section">
+                            <h2>ℹ️ Personal Details</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Date of Birth</label>
+                                    <input type="text" id="dob" value="08th Nov 1998" onchange="updatePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Marital Status</label>
+                                    <input type="text" id="marital" value="Unmarried" onchange="updatePreview()">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nationality</label>
+                                    <input type="text" id="nationality" value="Indian" onchange="updatePreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Father's Name</label>
+                                    <input type="text" id="fatherName" value="" placeholder="Father's full name" onchange="updatePreview()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Permanent Address</label>
+                                <textarea id="permanentAddress" onchange="updatePreview()" placeholder="Your permanent address..." style="min-height:55px;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Hobbies/Interests</label>
+                                <textarea id="hobbies" onchange="updatePreview()" placeholder="Your hobbies and interests...">Interacting with people, Listening to music, Working in a creative environment, Learning new technologies</textarea>
+                            </div>
+                        </div>
+
+                        <!-- References -->
+                        <div class="form-section">
+                            <h2>👥 References</h2>
+                            <div id="reference-list"></div>
+                            <button class="btn btn-add" onclick="addReference()">+ Add Reference</button>
+                        </div>
+
+                        <!-- Date & Signature -->
+                        <div class="form-section">
+                            <h2>✍️ Date & Signature</h2>
+                            <div class="form-group">
+                                <label>Declaration Date</label>
+                                <input type="text" id="declarationDate" placeholder="e.g. 05 June 2026" onchange="formData.declarationDate = this.value; updatePreview();">
+                            </div>
+                            <div class="form-group">
+                                <label>Declaration Place</label>
+                                <input type="text" id="declarationPlace" placeholder="e.g. New Delhi" onchange="formData.declarationPlace = this.value; updatePreview();">
+                            </div>
+                            <div class="form-group">
+                                <label>Draw Your Signature</label>
+                                <div style="border:1.5px solid #ddd; border-radius:7px; background:#fff; overflow:hidden; position:relative;">
+                                    <canvas id="signatureCanvas" width="420" height="100" style="display:block; cursor:crosshair; touch-action:none; width:100%; height:100px;"></canvas>
+                                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#ccc;font-size:12px;pointer-events:none;" id="signHint">Sign here ✍️</div>
+                                </div>
+                                <div style="display:flex;gap:10px;margin-top:6px;">
+                                    <button class="btn btn-secondary" style="font-size:11px;padding:6px 12px;" onclick="clearSignature()">🗑️ Clear</button>
+                                    <button class="btn btn-primary" style="font-size:11px;padding:6px 12px;" onclick="saveSignature()">✅ Save Signature</button>
+                                </div>
+                            </div>
+                            <div id="signSavedMsg" style="display:none;font-size:11px;color:green;margin-top:4px;">✓ Signature saved! It will appear on your resume.</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Preview -->
+                    <div>
+                        <div class="preview-label">📄 Resume Preview</div>
+                        <div class="preview-box">
+                            <div id="resume-preview"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Button -->
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goBack()">← Back to Templates</button>
+                    <button class="btn btn-primary" onclick="downloadPDF()">⬇️ Download PDF Resume</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let formData = {
+            fullName: 'RAJBAHADUR',
+            title: 'E-commerce Executive',
+            email: 'Kumar.raj9435@gmail.com',
+            phone: '+91-8826655562',
+            location: 'North East Delhi, Delhi-110094',
+            linkedin: '',
+            website: '',
+            gender: '',
+            photoBase64: '',
+            about: 'E-commerce professional with 5+ years of proven expertise in product listing, catalog management, and marketplace operations. Skilled in managing multiple e-commerce platforms, inventory optimization, and data-driven decision making. Proficient in Excel automation, accounting software, and marketplace reconciliation.',
+            experience: [
+                { company: 'Genuine Innovations Private Limited', title: 'E-commerce Executive', period: 'June 2024 - Present', details: 'Managed product listings across 8+ platforms (Amazon, Flipkart, Myntra, Nykaa, Meesho, Blinkit, Zepto). Created and updated catalogs with SEO-friendly content. Monitored sales trends and optimized inventory accordingly.' },
+                { company: 'Shrimad India Pvt. Ltd', title: 'E-commerce Manager', period: 'July 2023 - May 2024', details: 'Managed product listings, features, and descriptions. Coordinated order processing, delivery, and returns. Maintained accounts in Tally and Busy. Generated daily, weekly, and monthly MIS reports.' },
+                { company: 'Abhishti Textile Private Limited', title: 'E-commerce Executive', period: 'March 2019 - June 2023', details: 'Product listing, features, and description optimization. Examined sales-related metrics to inform restocks. Coordinated order processing and customer returns. Created promotional offers and managed inventory levels.' }
+            ],
+            education: [
+                { degree: 'B.Com (Programme)', institution: 'Delhi University', year: '2023' },
+                { degree: 'BCA (2nd Year)', institution: 'IGNOU', year: 'Pursuing' },
+                { degree: '12th (CBSE)', institution: 'CBSE Board', year: '2019' },
+                { degree: '10th (CBSE)', institution: 'CBSE Board', year: '2017' }
+            ],
+            skills: 'E-commerce Operations, Amazon, Flipkart, Myntra, Nykaa, Meesho, Blinkit, Zepto, Product Listing, Catalog Management, Inventory Management, Marketplace Reconciliation, Advanced Excel, Unicommerce, Tally Prime, Busy Accounting, SEO Optimization, MIS Reporting',
+            strengths: 'Energetic and able to work under pressure, Friendly and easy to work with, Optimistic attitude, Eager to learn new skills, Quickly adaptable, Strong analytical abilities, Detail-oriented, Self-motivated',
+            languages: 'Hindi, English',
+            dob: '08th Nov 1998',
+            marital: 'Unmarried',
+            nationality: 'Indian',
+            fatherName: '',
+            permanentAddress: '',
+            hobbies: 'Interacting with people, Listening to music, Working in a creative environment, Learning new technologies',
+            references: [
+                { name: '', designation: '', company: '', phone: '', email: '' },
+                { name: '', designation: '', company: '', phone: '', email: '' }
+            ],
+            declarationDate: '',
+            declarationPlace: '',
+            signatureBase64: ''
+        };
+
+        let selectedTemplate = null;
+
+        function selectTemplate(template) {
+            selectedTemplate = template;
+            document.querySelectorAll('.template-card').forEach(card => card.classList.remove('selected'));
+            event.target.closest('.template-card').classList.add('selected');
+            
+            setTimeout(() => {
+                document.getElementById('step-template').classList.add('hidden');
+                document.getElementById('step-form').classList.remove('hidden');
+                renderForm();
+                updatePreview();
+            }, 300);
+        }
+
+        function goBack() {
+            document.getElementById('step-template').classList.remove('hidden');
+            document.getElementById('step-form').classList.add('hidden');
+        }
+
+        function addExperience() {
+            formData.experience.push({ company: '', title: '', period: '', details: '' });
+            renderExperience();
+        }
+
+        function addEducation() {
+            formData.education.push({ degree: '', institution: '', year: '' });
+            renderEducation();
+        }
+
+        function addReference() {
+            formData.references.push({ name: '', designation: '', company: '', phone: '', email: '' });
+            renderReferences();
+        }
+
+        function handlePhotoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                formData.photoBase64 = e.target.result;
+                document.getElementById('photoThumb').src = e.target.result;
+                document.getElementById('photoPreviewThumb').style.display = 'block';
+                updatePreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto() {
+            formData.photoBase64 = '';
+            document.getElementById('photoUpload').value = '';
+            document.getElementById('photoPreviewThumb').style.display = 'none';
+            updatePreview();
+        }
+
+        /* ---- Signature Canvas ---- */
+        let sigCanvas, sigCtx, sigDrawing = false, sigHasMark = false;
+
+        function initSignatureCanvas() {
+            sigCanvas = document.getElementById('signatureCanvas');
+            if (!sigCanvas) return;
+            sigCtx = sigCanvas.getContext('2d');
+            sigCtx.strokeStyle = '#1a1a2e';
+            sigCtx.lineWidth = 2;
+            sigCtx.lineCap = 'round';
+            sigCtx.lineJoin = 'round';
+
+            function getPos(e) {
+                const r = sigCanvas.getBoundingClientRect();
+                const scaleX = sigCanvas.width / r.width;
+                const scaleY = sigCanvas.height / r.height;
+                const src = e.touches ? e.touches[0] : e;
+                return { x: (src.clientX - r.left) * scaleX, y: (src.clientY - r.top) * scaleY };
+            }
+
+            sigCanvas.addEventListener('mousedown', (e) => { sigDrawing = true; const p = getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x, p.y); });
+            sigCanvas.addEventListener('mousemove', (e) => { if (!sigDrawing) return; const p = getPos(e); sigCtx.lineTo(p.x, p.y); sigCtx.stroke(); sigHasMark = true; document.getElementById('signHint').style.display = 'none'; });
+            sigCanvas.addEventListener('mouseup', () => { sigDrawing = false; });
+            sigCanvas.addEventListener('mouseleave', () => { sigDrawing = false; });
+            sigCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); sigDrawing = true; const p = getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x, p.y); }, { passive: false });
+            sigCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); if (!sigDrawing) return; const p = getPos(e); sigCtx.lineTo(p.x, p.y); sigCtx.stroke(); sigHasMark = true; document.getElementById('signHint').style.display = 'none'; }, { passive: false });
+            sigCanvas.addEventListener('touchend', () => { sigDrawing = false; });
+        }
+
+        function clearSignature() {
+            if (!sigCtx) return;
+            sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+            sigHasMark = false;
+            formData.signatureBase64 = '';
+            document.getElementById('signHint').style.display = 'block';
+            document.getElementById('signSavedMsg').style.display = 'none';
+            updatePreview();
+        }
+
+        function saveSignature() {
+            if (!sigCanvas || !sigHasMark) return;
+            formData.signatureBase64 = sigCanvas.toDataURL('image/png');
+            document.getElementById('signSavedMsg').style.display = 'block';
+            updatePreview();
+        }
+
+        function renderExperience() {
+            const list = document.getElementById('experience-list');
+            list.innerHTML = '';
+            formData.experience.forEach((exp, idx) => {
+                list.innerHTML += `
+                    <div class="item-card">
+                        <button class="btn btn-remove" onclick="formData.experience.splice(${idx}, 1); renderExperience(); updatePreview();">Remove</button>
+                        <div style="clear: both;"></div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Job Title</label>
+                                <input type="text" value="${exp.title}" onchange="formData.experience[${idx}].title = this.value; updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Company</label>
+                                <input type="text" value="${exp.company}" onchange="formData.experience[${idx}].company = this.value; updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Period (e.g., June 2024 - Present)</label>
+                            <input type="text" value="${exp.period}" onchange="formData.experience[${idx}].period = this.value; updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Details & Achievements</label>
+                            <textarea onchange="formData.experience[${idx}].details = this.value; updatePreview()">${exp.details}</textarea>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderEducation() {
+            const list = document.getElementById('education-list');
+            list.innerHTML = '';
+            formData.education.forEach((edu, idx) => {
+                list.innerHTML += `
+                    <div class="item-card">
+                        <button class="btn btn-remove" onclick="formData.education.splice(${idx}, 1); renderEducation(); updatePreview();">Remove</button>
+                        <div style="clear: both;"></div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Degree</label>
+                                <input type="text" value="${edu.degree}" onchange="formData.education[${idx}].degree = this.value; updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Year</label>
+                                <input type="text" value="${edu.year}" onchange="formData.education[${idx}].year = this.value; updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Institution</label>
+                            <input type="text" value="${edu.institution}" onchange="formData.education[${idx}].institution = this.value; updatePreview()">
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderReferences() {
+            const list = document.getElementById('reference-list');
+            list.innerHTML = '';
+            formData.references.forEach((ref, idx) => {
+                list.innerHTML += `
+                    <div class="item-card">
+                        <button class="btn btn-remove" onclick="formData.references.splice(${idx}, 1); renderReferences(); updatePreview();">Remove</button>
+                        <div style="clear: both;"></div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" value="${ref.name}" onchange="formData.references[${idx}].name = this.value; updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Designation</label>
+                                <input type="text" value="${ref.designation}" onchange="formData.references[${idx}].designation = this.value; updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Company</label>
+                                <input type="text" value="${ref.company}" onchange="formData.references[${idx}].company = this.value; updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text" value="${ref.phone}" onchange="formData.references[${idx}].phone = this.value; updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="text" value="${ref.email}" onchange="formData.references[${idx}].email = this.value; updatePreview()">
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderForm() {
+            document.getElementById('fullName').addEventListener('change', (e) => { formData.fullName = e.target.value; updatePreview(); });
+            document.getElementById('title').addEventListener('change', (e) => { formData.title = e.target.value; updatePreview(); });
+            document.getElementById('email').addEventListener('change', (e) => { formData.email = e.target.value; updatePreview(); });
+            document.getElementById('phone').addEventListener('change', (e) => { formData.phone = e.target.value; updatePreview(); });
+            document.getElementById('location').addEventListener('change', (e) => { formData.location = e.target.value; updatePreview(); });
+            document.getElementById('linkedin').addEventListener('change', (e) => { formData.linkedin = e.target.value; updatePreview(); });
+            document.getElementById('website').addEventListener('change', (e) => { formData.website = e.target.value; updatePreview(); });
+            document.getElementById('gender').addEventListener('change', (e) => { formData.gender = e.target.value; updatePreview(); });
+            document.getElementById('about').addEventListener('change', (e) => { formData.about = e.target.value; updatePreview(); });
+            document.getElementById('skills').addEventListener('change', (e) => { formData.skills = e.target.value; updatePreview(); });
+            document.getElementById('strengths').addEventListener('change', (e) => { formData.strengths = e.target.value; updatePreview(); });
+            document.getElementById('languages').addEventListener('change', (e) => { formData.languages = e.target.value; updatePreview(); });
+            document.getElementById('dob').addEventListener('change', (e) => { formData.dob = e.target.value; updatePreview(); });
+            document.getElementById('marital').addEventListener('change', (e) => { formData.marital = e.target.value; updatePreview(); });
+            document.getElementById('nationality').addEventListener('change', (e) => { formData.nationality = e.target.value; updatePreview(); });
+            document.getElementById('fatherName').addEventListener('change', (e) => { formData.fatherName = e.target.value; updatePreview(); });
+            document.getElementById('permanentAddress').addEventListener('change', (e) => { formData.permanentAddress = e.target.value; updatePreview(); });
+            document.getElementById('hobbies').addEventListener('change', (e) => { formData.hobbies = e.target.value; updatePreview(); });
+
+            renderExperience();
+            renderEducation();
+            renderReferences();
+
+            // Init signature canvas after DOM is ready
+            setTimeout(initSignatureCanvas, 100);
+        }
+
+        function updatePreview() {
+            if (selectedTemplate === 'yellow') {
+                renderYellowTemplate();
+            } else if (selectedTemplate === 'navy') {
+                renderNavyTemplate();
+            } else {
+                renderDefaultTemplate();
+            }
+        }
+
+        function getPersonalDetailsHTML(labelStyle) {
+            let rows = [];
+            if (formData.dob) rows.push(['Date of Birth', formData.dob]);
+            if (formData.gender) rows.push(['Gender', formData.gender]);
+            if (formData.marital) rows.push(['Marital Status', formData.marital]);
+            if (formData.nationality) rows.push(['Nationality', formData.nationality]);
+            if (formData.fatherName) rows.push(["Father's Name", formData.fatherName]);
+            if (formData.permanentAddress) rows.push(['Permanent Address', formData.permanentAddress]);
+            if (formData.hobbies) rows.push(['Hobbies', formData.hobbies]);
+            return rows;
+        }
+
+        function getSignatureDeclarationHTML(bgColor) {
+            if (!formData.declarationDate && !formData.declarationPlace && !formData.signatureBase64) return '';
+            const bg = bgColor || '#f9f9f9';
+            const placeDate = [formData.declarationPlace, formData.declarationDate].filter(Boolean).join(', ');
+            return `
+                <div style="margin-top:18px; padding:14px 16px; background:${bg}; border-top:2px solid #ddd;">
+                    <p style="font-size:10px; margin:0 0 6px 0; line-height:1.5; color:#444;">
+                        <strong>Declaration:</strong> I hereby declare that all the information mentioned above is true and correct to the best of my knowledge and belief.
+                    </p>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:10px;">
+                        <div>
+                            ${placeDate ? `<p style="font-size:10px; margin:0; color:#555;">📅 <strong>Date & Place:</strong> ${placeDate}</p>` : ''}
+                        </div>
+                        <div style="text-align:center; min-width:140px;">
+                            ${formData.signatureBase64
+                                ? `<img src="${formData.signatureBase64}" style="height:45px; max-width:140px; object-fit:contain; display:block; margin:0 auto;">`
+                                : `<div style="height:45px; border-bottom:1.5px solid #555; width:140px;"></div>`}
+                            <p style="font-size:9px; color:#777; margin:3px 0 0; text-align:center;">Signature</p>
+                            <p style="font-size:9px; font-weight:700; color:#333; margin:1px 0 0; text-align:center;">${formData.fullName}</p>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        /* ============ DEFAULT / MODERN / PROFESSIONAL / CREATIVE ============ */
+        function renderDefaultTemplate() {
+            let contactParts = [formData.email, formData.phone, formData.location].filter(Boolean);
+            let contactLine2Parts = [];
+            if (formData.linkedin) contactLine2Parts.push('🔗 ' + formData.linkedin);
+            if (formData.website) contactLine2Parts.push('🌐 ' + formData.website);
+
+            let photoHtml = formData.photoBase64 ? `<img src="${formData.photoBase64}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid #333;float:left;margin-right:15px;">` : '';
+
+            let html = `
+                <div class="resume-header" style="overflow:hidden;">
+                    ${photoHtml}
+                    <div>
+                        <h1>${formData.fullName}</h1>
+                        <p style="margin: 4px 0; font-size: 12px; font-weight: 500;">${formData.title}</p>
+                        <p class="contact-info">${contactParts.join(' | ')}</p>
+                        ${contactLine2Parts.length ? `<p class="contact-info" style="margin-top:3px;">${contactLine2Parts.join(' | ')}</p>` : ''}
+                    </div>
+                </div>
+            `;
+
+            if (formData.about) {
+                html += `<div class="resume-section"><h2>Professional Summary</h2><p style="font-size:11px;margin:0;line-height:1.4;">${formData.about}</p></div>`;
+            }
+
+            html += '<div class="resume-section"><h2>Experience</h2>';
+            formData.experience.forEach(exp => {
+                if (exp.title || exp.company) {
+                    html += `<div class="resume-item"><div class="resume-item-title"><strong>${exp.title||'Job Title'}</strong><span>${exp.period||'Period'}</span></div><div class="resume-item-subtitle">${exp.company||'Company'}</div>${exp.details?`<p style="font-size:10px;margin:3px 0 0 0;line-height:1.3;">• ${exp.details}</p>`:''}</div>`;
+                }
+            });
+            html += '</div>';
+
+            html += '<div class="resume-section"><h2>Education</h2>';
+            formData.education.forEach(edu => {
+                if (edu.degree || edu.institution) {
+                    html += `<div class="resume-item"><div class="resume-item-title"><strong>${edu.degree||'Degree'}</strong><span>${edu.year||'Year'}</span></div><div class="resume-item-subtitle">${edu.institution||'Institution'}</div></div>`;
+                }
+            });
+            html += '</div>';
+
+            if (formData.skills) html += `<div class="resume-section"><h2>Skills</h2><p style="font-size:11px;margin:0;line-height:1.4;">${formData.skills}</p></div>`;
+            if (formData.strengths) html += `<div class="resume-section"><h2>Strengths</h2><p style="font-size:11px;margin:0;line-height:1.4;">${formData.strengths}</p></div>`;
+            if (formData.languages) html += `<div class="resume-section"><h2>Languages</h2><p style="font-size:11px;margin:0;">${formData.languages}</p></div>`;
+
+            let refs = formData.references.filter(r => r.name && r.designation);
+            if (refs.length > 0) {
+                html += '<div class="resume-section"><h2>References</h2>';
+                refs.forEach(ref => { html += `<div class="resume-item"><div class="resume-item-title"><strong>${ref.name}</strong></div><div class="resume-item-subtitle">${ref.designation} at ${ref.company}</div><p style="font-size:10px;margin:2px 0 0 0;">${ref.phone} | ${ref.email}</p></div>`; });
+                html += '</div>';
+            }
+
+            let personalRows = getPersonalDetailsHTML();
+            if (personalRows.length > 0) {
+                html += `<div class="resume-section"><h2>Personal Details</h2><table style="font-size:11px;width:100%;border-collapse:collapse;line-height:1.6;">`;
+                for (let i = 0; i < personalRows.length; i += 2) {
+                    html += `<tr><td style="width:50%;padding:2px 4px;"><strong>${personalRows[i][0]}:</strong> ${personalRows[i][1]}</td><td style="width:50%;padding:2px 4px;">${personalRows[i+1]?`<strong>${personalRows[i+1][0]}:</strong> ${personalRows[i+1][1]}`:''}</td></tr>`;
+                }
+                html += '</table></div>';
+            }
+
+            html += getSignatureDeclarationHTML('#f9f9f9');
+
+            document.getElementById('resume-preview').innerHTML = html;
+        }
+
+        /* ============ YELLOW TEMPLATE (Image 1 style) ============ */
+        function renderYellowTemplate() {
+            const photoHtml = formData.photoBase64
+                ? `<img src="${formData.photoBase64}" style="width:85px;height:85px;object-fit:cover;border:3px solid #fff;border-radius:4px;">`
+                : `<div style="width:85px;height:85px;background:#fff3;border:2px dashed #fff8;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff8;">Photo</div>`;
+
+            const badgeStyle = `display:inline-block;background:#222;color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:2px;margin-bottom:8px;text-transform:uppercase;`;
+            const sectionLabelStyle = `display:inline-block;background:#222;color:#fff;font-size:9px;font-weight:700;letter-spacing:1.2px;padding:3px 9px;border-radius:2px;margin-bottom:7px;text-transform:uppercase;`;
+
+            let skillsHtml = '';
+            if (formData.skills) {
+                formData.skills.split(',').slice(0,8).forEach(s => {
+                    skillsHtml += `<div style="margin-bottom:5px;"><span style="font-size:10px;">${s.trim()}</span><div style="height:3px;background:#222;border-radius:2px;margin-top:2px;width:${Math.floor(Math.random()*30+60)}%;"></div></div>`;
+                });
+            }
+            let langsHtml = '';
+            if (formData.languages) {
+                formData.languages.split(',').forEach(l => {
+                    langsHtml += `<div style="margin-bottom:5px;"><span style="font-size:10px;">${l.trim()}</span><div style="height:3px;background:#222;border-radius:2px;margin-top:2px;width:75%;"></div></div>`;
+                });
+            }
+
+            let expHtml = '';
+            formData.experience.forEach(exp => {
+                if (exp.title || exp.company) {
+                    const details = exp.details ? exp.details.split('.').filter(d=>d.trim()).map(d=>`<li style="margin-bottom:2px;">${d.trim()}.</li>`).join('') : '';
+                    expHtml += `<div style="margin-bottom:10px;"><div style="font-weight:700;font-size:11px;">${exp.title||''}${exp.company?`, ${exp.company}`:''}${exp.location?`, ${exp.location}`:''}</div><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin:2px 0 4px;">${exp.period||''}</div>${details?`<ul style="font-size:10px;padding-left:15px;margin:0;line-height:1.5;">${details}</ul>`:''}</div>`;
+                }
+            });
+
+            let eduHtml = '';
+            formData.education.forEach(edu => {
+                if (edu.degree || edu.institution) {
+                    eduHtml += `<div style="margin-bottom:8px;"><div style="font-weight:700;font-size:11px;">${edu.degree||''}${edu.institution?`, ${edu.institution}`:''}${edu.location?`, ${edu.location}`:''}</div><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin:2px 0 4px;">${edu.year||''}</div></div>`;
+                }
+            });
+
+            let contactHtml = `<p style="font-size:10px;margin:3px 0;">${formData.location||''}</p><p style="font-size:10px;margin:3px 0;">${formData.email||''}</p><p style="font-size:10px;margin:3px 0;">${formData.phone||''}</p>`;
+            if (formData.linkedin) contactHtml += `<p style="font-size:10px;margin:3px 0;">🔗 ${formData.linkedin}</p>`;
+            if (formData.website) contactHtml += `<p style="font-size:10px;margin:3px 0;">🌐 ${formData.website}</p>`;
+
+            let personalRows = getPersonalDetailsHTML();
+            let personalHtml = '';
+            if (personalRows.length > 0) {
+                personalHtml = `<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">Personal</span>`;
+                personalRows.forEach(r => { personalHtml += `<p style="font-size:10px;margin:2px 0;"><strong>${r[0]}:</strong> ${r[1]}</p>`; });
+                personalHtml += '</div>';
+            }
+
+            let refsHtml = '';
+            const refs = formData.references.filter(r=>r.name&&r.designation);
+            if (refs.length) {
+                refs.forEach(ref => { refsHtml += `<div style="margin-bottom:7px;font-size:10px;"><strong>${ref.name}</strong><br>${ref.designation}${ref.company?` at ${ref.company}`:''}<br>${ref.phone||''}${ref.email?` | ${ref.email}`:''}</div>`; });
+            }
+
+            const html = `
+            <div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;min-height:297mm;">
+                <!-- Yellow Header -->
+                <div style="background:#f5c800;padding:22px 25px;display:flex;align-items:center;gap:18px;min-height:100px;">
+                    ${photoHtml}
+                    <div>
+                        <h1 style="font-size:24px;font-weight:900;letter-spacing:1px;margin:0;color:#000;line-height:1.1;">${formData.fullName}</h1>
+                        <p style="font-size:12px;color:#444;margin:4px 0 0;font-weight:500;">${formData.title}</p>
+                    </div>
+                </div>
+                <!-- Body -->
+                <div style="padding:20px 25px;">
+                    <!-- Details Badge -->
+                    <div style="margin-bottom:14px;">
+                        <span style="${sectionLabelStyle}">Details</span>
+                        ${contactHtml}
+                    </div>
+                    ${formData.about?`<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">Profile</span><p style="font-size:10px;line-height:1.5;margin:0;">${formData.about}</p></div>`:''}
+                    ${eduHtml?`<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">Education</span>${eduHtml}</div>`:''}
+                    ${expHtml?`<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">Employment History</span>${expHtml}</div>`:''}
+                    ${skillsHtml?`<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">Skills</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 15px;">${skillsHtml}</div></div>`:''}
+                    ${langsHtml?`<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">Languages</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 15px;">${langsHtml}</div></div>`:''}
+                    ${formData.strengths?`<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">Strengths</span><p style="font-size:10px;line-height:1.5;margin:0;">${formData.strengths}</p></div>`:''}
+                    ${personalHtml}
+                    ${refsHtml?`<div style="margin-bottom:14px;"><span style="${sectionLabelStyle}">References</span>${refsHtml}</div>`:''}
+                    ${getSignatureDeclarationHTML('#fffbe6')}
+                </div>
+            </div>`;
+
+            document.getElementById('resume-preview').innerHTML = html;
+        }
+
+        /* ============ NAVY EXECUTIVE TEMPLATE (Image 2 style) ============ */
+        function renderNavyTemplate() {
+            const NAVY = '#1a2e4a';
+            const ACCENT = '#4a90d9';
+
+            const photoHtml = formData.photoBase64
+                ? `<img src="${formData.photoBase64}" style="width:75px;height:75px;object-fit:cover;border-radius:50%;border:3px solid ${ACCENT};margin-bottom:12px;">`
+                : '';
+
+            const sideLabel = (txt) => `<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${ACCENT};border-bottom:1px solid #ffffff33;padding-bottom:4px;margin:14px 0 7px;">${txt}</div>`;
+            const mainLabel = (txt) => `<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${NAVY};border-bottom:2px solid ${NAVY};padding-bottom:4px;margin:16px 0 8px;display:flex;align-items:center;gap:6px;">${txt}</div>`;
+
+            // Sidebar content
+            let sideContact = `${sideLabel('Contact')}`;
+            if (formData.email) sideContact += `<p style="font-size:9px;margin:3px 0;color:#ccd;word-break:break-all;">✉ ${formData.email}</p>`;
+            if (formData.phone) sideContact += `<p style="font-size:9px;margin:3px 0;color:#ccd;">📞 ${formData.phone}</p>`;
+            if (formData.location) sideContact += `<p style="font-size:9px;margin:3px 0;color:#ccd;">📍 ${formData.location}</p>`;
+            if (formData.linkedin) sideContact += `<p style="font-size:9px;margin:3px 0;color:#ccd;">🔗 ${formData.linkedin}</p>`;
+            if (formData.website) sideContact += `<p style="font-size:9px;margin:3px 0;color:#ccd;">🌐 ${formData.website}</p>`;
+
+            let sideLangs = '';
+            if (formData.languages) {
+                sideLangs = sideLabel('Languages');
+                formData.languages.split(',').forEach(l => {
+                    sideLangs += `<div style="margin-bottom:5px;"><span style="font-size:9px;color:#dde;">${l.trim()}</span><div style="height:3px;background:${ACCENT};border-radius:2px;margin-top:2px;width:75%;opacity:0.8;"></div></div>`;
+                });
+            }
+
+            let sideStrengths = '';
+            if (formData.strengths) {
+                sideStrengths = sideLabel('Key Strengths');
+                formData.strengths.split(',').forEach(s => {
+                    sideStrengths += `<p style="font-size:9px;color:#ccd;margin:2px 0;">• ${s.trim()}</p>`;
+                });
+            }
+
+            let personalRows = getPersonalDetailsHTML();
+            let sidePersonal = '';
+            if (personalRows.length > 0) {
+                sidePersonal = sideLabel('Personal');
+                personalRows.forEach(r => { sidePersonal += `<p style="font-size:9px;color:#ccd;margin:2px 0;"><span style="color:#aac;">${r[0]}:</span> ${r[1]}</p>`; });
+            }
+
+            let sideAwards = '';
+            let refs = formData.references.filter(r=>r.name&&r.designation);
+            if (refs.length) {
+                sideAwards = sideLabel('References');
+                refs.forEach(ref => { sideAwards += `<div style="margin-bottom:7px;"><p style="font-size:9px;font-weight:700;color:#dde;margin:0;">${ref.name}</p><p style="font-size:8px;color:#aac;margin:1px 0;">${ref.designation}${ref.company?` · ${ref.company}`:''}</p><p style="font-size:8px;color:#889;margin:1px 0;">${ref.phone||''}</p></div>`; });
+            }
+
+            // Main content
+            let expHtml = '';
+            formData.experience.forEach(exp => {
+                if (exp.title || exp.company) {
+                    const details = exp.details ? exp.details.split('.').filter(d=>d.trim()).map(d=>`<li style="margin-bottom:3px;">${d.trim()}.</li>`).join('') : '';
+                    expHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;font-size:11px;color:${NAVY};">${exp.company||''}</div><div style="font-size:10px;color:#555;">${exp.title||''}</div><div style="font-size:9px;color:#888;margin:2px 0 4px;">${exp.period||''}</div>${details?`<ul style="font-size:10px;padding-left:15px;margin:0;line-height:1.5;color:#333;">${details}</ul>`:''}</div>`;
+                }
+            });
+
+            let eduHtml = '';
+            formData.education.forEach(edu => {
+                if (edu.degree || edu.institution) {
+                    eduHtml += `<div style="margin-bottom:9px;"><div style="font-weight:700;font-size:11px;color:${NAVY};">${edu.degree||''}</div><div style="font-size:10px;color:#555;">${edu.institution||''}</div><div style="font-size:9px;color:#888;margin:1px 0;">${edu.year||''}</div></div>`;
+                }
+            });
+
+            let skillsHtml = '';
+            if (formData.skills) {
+                formData.skills.split(',').forEach(s => {
+                    skillsHtml += `<li style="font-size:10px;margin-bottom:4px;color:#333;">${s.trim()}</li>`;
+                });
+            }
+
+            const html = `
+            <div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#222;display:flex;min-height:297mm;">
+                <!-- Sidebar -->
+                <div style="width:33%;background:${NAVY};padding:22px 16px;flex-shrink:0;">
+                    ${photoHtml ? `<div style="text-align:center;">${photoHtml}</div>` : ''}
+                    <h2 style="font-size:16px;font-weight:900;color:#fff;margin:0;line-height:1.2;">${formData.fullName}</h2>
+                    <p style="font-size:10px;color:${ACCENT};margin:4px 0 0;font-weight:500;">${formData.title}</p>
+                    ${sideContact}
+                    ${formData.about?`${sideLabel('Profile')}<p style="font-size:9px;color:#ccd;line-height:1.5;margin:0;">${formData.about}</p>`:''}
+                    ${sideLangs}
+                    ${sideStrengths}
+                    ${sidePersonal}
+                    ${sideAwards}
+                </div>
+                <!-- Main Content -->
+                <div style="flex:1;padding:22px 20px;">
+                    ${expHtml?`${mainLabel('💼 Work Experience')}${expHtml}`:''}
+                    ${eduHtml?`${mainLabel('🎓 Education')}${eduHtml}`:''}
+                    ${skillsHtml?`${mainLabel('🎯 Skills')}<ul style="padding-left:15px;margin:0;columns:2;">${skillsHtml}</ul>`:''}
+                    ${getSignatureDeclarationHTML('#f0f4f8')}
+                </div>
+            </div>`;
+
+            document.getElementById('resume-preview').innerHTML = html;
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('resume-preview');
+            const opt = {
+                margin: [8, 8, 8, 8],
+                filename: `${formData.fullName || 'Resume'}_Resume.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                },
+                jsPDF: {
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            // Temporarily ensure white background for capture
+            const origBg = element.style.background;
+            element.style.background = '#ffffff';
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.background = origBg;
+            });
+        }
+    </script>
+</body>
+</html>
